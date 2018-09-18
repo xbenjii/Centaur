@@ -21,13 +21,10 @@ export default class AppMount extends Component {
   };
 
   static WS_URI = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
-<<<<<<< HEAD
-=======
 
   static NOTIFICATION_OPTIONS = {
     icon: '/Resources/Images/materialistic.jpg'
   };
->>>>>>> upstream/master
 
   /**
    * @type {WebSocket}
