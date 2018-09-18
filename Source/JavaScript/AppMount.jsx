@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import "../Styles/CentaurBase.scss";
 import MuiThemeProvider from "@material-ui/core/es/styles/MuiThemeProvider";
 import {MaterialTheme} from "./Themes/MaterialTheme";
-import Navbar from "./Components/Navigation/Navbar";
+// import Navbar from "./Components/Navigation/Navbar";
 import ContextPageHandler from "./Components/ContextPage/ContextPageHandler";
 import {Subscriber} from "./Functional/Subscriber";
 import {SubscriptionsEnum} from "./Configuration/SubscriptionsEnum";
 import Register from "./Components/Register/Register";
 import {Registrar} from "./Functional/Registrar";
+import ChatStore from "./Components/ChatApp/Chat/ChatStore";
 
 export default class AppMount extends Component {
   state = {
@@ -20,6 +21,13 @@ export default class AppMount extends Component {
   };
 
   static WS_URI = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+<<<<<<< HEAD
+=======
+
+  static NOTIFICATION_OPTIONS = {
+    icon: '/Resources/Images/materialistic.jpg'
+  };
+>>>>>>> upstream/master
 
   /**
    * @type {WebSocket}
@@ -75,6 +83,34 @@ export default class AppMount extends Component {
     context
   });
 
+  showNotification(message, callback) {
+    let notification = null;
+
+    if(!("Notification" in window)) return;
+
+    else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      notification = new Notification('New Message!', {
+        ...AppMount.NOTIFICATION_OPTIONS,
+        body: message
+      });
+    }
+
+    else if (Notification.permission !== "denied") {
+      Notification.requestPermission((permission) => {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          notification = new Notification('New Message!', {
+            ...AppMount.NOTIFICATION_OPTIONS,
+            body: message
+          });
+        }
+      });
+    }
+
+    notification.addEventListener('click', () => callback());
+  }
+
   render() {
     return (
       <MuiThemeProvider theme={MaterialTheme}>
@@ -84,17 +120,20 @@ export default class AppMount extends Component {
               ? (
                 <React.Fragment>
                   <main className="content-space">
-                    <ContextPageHandler
-                      context={this.state.context}
-                      websocket={this.webSocket}
-                      activeUsername={this.state.activeUsername}
-                      activeUserAbout={this.state.userAbout}
-                      joinCode={this.state.joinCode}
-                    />
+                    <ChatStore>
+                      <ContextPageHandler
+                        context={this.state.context}
+                        websocket={this.webSocket}
+                        activeUsername={this.state.activeUsername}
+                        activeUserAbout={this.state.userAbout}
+                        joinCode={this.state.joinCode}
+                        showNotification={(message, callback) => this.showNotification(message, callback)}
+                      />
+                    </ChatStore>
                   </main>
-                  <footer className="nav-space">
-                    <Navbar onChange={this.changeContext} />
-                  </footer>
+                  {/*<footer className="nav-space">*/}
+                    {/*<Navbar onChange={this.changeContext} />*/}
+                  {/*</footer>*/}
                 </React.Fragment>
               )
               : <Register onRegister={(data) => this.registerUser(data)} />

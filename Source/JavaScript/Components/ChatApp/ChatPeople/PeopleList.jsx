@@ -24,21 +24,26 @@ export default class PeopleList extends Component {
   };
 
   addPerson(person, code, switchContext = true) {
+    const personObj = {
+      ...person,
+      code
+    };
+
     this.setState(prevState => ({
       people: [
         ...prevState.people,
         {
-          ...person,
-          code
+          ...personObj
         }
       ]
     }));
     if(switchContext) {
       this.changeChatContext({
-        ...person,
-        code
+        ...personObj
       });
     }
+
+    this.props.storeAddPerson({...personObj});
   }
 
   componentDidMount() {
@@ -52,7 +57,16 @@ export default class PeopleList extends Component {
     );
 
     this.props.setAddNewPerson((person, code) => this.addPerson(person, code));
-    this.props.setOpenConversation((person) => this.changeChatContext(person))
+    this.props.setOpenConversation((person) => this.changeChatContext(person));
+
+    this.setState({
+      people: this.props.chatStore.people,
+      activeChatContext: this.props.chatStore.activeChatContext
+    }, () => {
+      if(this.props.chatStore.activeChatContext.code !== null) {
+        this.props.onChange(this.props.chatStore.activeChatContext);
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -62,17 +76,14 @@ export default class PeopleList extends Component {
   }
 
   changeChatContext(person) {
-    this.props.onChange({
+    const context = {
       ...person,
       active: true
-    });
+    };
+    this.props.onChange(context);
+    this.props.storeSetActiveChatContext(context);
     this.setState({
-      activeChatContext: {
-        username: person['username'],
-        details: person['details'],
-        code: person['code'],
-        active: true
-      }
+      activeChatContext: context
     });
   }
 
@@ -132,7 +143,15 @@ export default class PeopleList extends Component {
       <section className="people-list">
         {this.state.people.length !== 0
           ? (this.state.people.map((person, index) => (
-            <div tabIndex={1} className={`person ${this.state.activeChatContext.username === person['username'] && 'active'}`} key={index} role="button" onClick={this.state.activeChatContext.username === person['username'] ? (() => {}) : (() => this.changeChatContext(person))}>
+            <div
+              tabIndex={1}
+              className={`person ${this.state.activeChatContext.username === person['username'] && 'active'}`}
+              key={index}
+              role="button"
+              onClick={this.state.activeChatContext.username === person['username']
+                ? (() => {})
+                : (() => this.changeChatContext(person))}
+            >
               <MoreVertIcon className="action-trigger" />
               <Avatar className="person-avatar">
                 {person.username[0].toUpperCase()}
