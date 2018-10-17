@@ -1,5 +1,4 @@
 ### Centaur
-Don't mind the name, I just came up with it randomly.
 
 It would be a simple chatting app for the web for personal threads between people. The only way
 to start chatting with somebody would be to share a unique link with them which would connect you
@@ -7,18 +6,20 @@ with them instantly!
 
 Cool, right?
 
+Thanks [@BenForture](https://github.com/xbenjii) for providing the docker container for a live version! <3
+
 How to start a development state:
 ```
 # clone the repo
 
 cd Centaur
-npm install
-npm run dev
+cd Source/Server/
+node ExpressHandler.js
 
 # on another cmd / terminal process
 
-cd Source/Server/
-node ExpressHandler.js
+npm install
+npm run dev
 ```
 
 Here are some screenshots to get you started.
